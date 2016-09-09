@@ -9,14 +9,11 @@ import java.math.BigDecimal;
 /**
  * Created by Samuel on 2016-09-07.
  */
-public class BigDecimalConverter extends ConverterV8Object<BigDecimal> {
+public class BigDecimalConverter extends Converter<BigDecimal, Double> {
 
     @Override
-    protected V8Object setV8Object(V8Object v8Object, V8 v8, BigDecimal bigDecimal) {
-        v8Object.add("doubleValue", new V8Function(v8, (receiver, parameters) -> bigDecimal.doubleValue()));
-        v8Object.add("intValue", new V8Function(v8, (receiver, parameters) -> bigDecimal.intValue()));
-
-        return v8Object;
+    public Double convertToV8(V8 v8, BigDecimal bigDecimal) {
+        return bigDecimal.doubleValue();
     }
 
     @Override
