@@ -34,7 +34,7 @@ public class ContextConverter extends ConverterV8Object<Context> {
     }
 
     @Override
-    protected V8Object setV8Object(V8Object v8Object, V8 v8, Context context) {
+    protected void setV8Object(V8Object v8Object, V8 v8, Context context) {
         v8Object.add("getKey", new V8Function(v8, (receiver, parameters) -> context.getKey()));
         v8Object.add("getValue", new V8Function(v8, (receiver, parameters) -> context.getValue()));
         v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> context.getName()));
@@ -46,8 +46,6 @@ public class ContextConverter extends ConverterV8Object<Context> {
 
             return lastValue;
         }));
-
-        return v8Object;
     }
 
     @Override
