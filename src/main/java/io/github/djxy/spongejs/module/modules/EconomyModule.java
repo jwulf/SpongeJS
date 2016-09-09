@@ -22,7 +22,9 @@ import java.util.UUID;
  */
 public class EconomyModule implements Module {
 
-    private final CurrencyConverter currencyConverter = new CurrencyConverter();
+    private static final CurrencyConverter currencyConverter = new CurrencyConverter();
+    private static final AccountConverter accountConverter = new AccountConverter();
+    private static final UniqueAccountConverter uniqueAccountConverter = new UniqueAccountConverter();
 
     @Override
     public void initilize(V8 serverRuntime) {
@@ -40,18 +42,18 @@ public class EconomyModule implements Module {
         }));
         economyService.add("getOrCreateAccount", new V8Function(serverRuntime, (receiver, parameters) -> {
             V8Object account = null;
-            
+
             try{
                 UUID uuid = UUID.fromString(parameters.getString(0));
                 Optional<UniqueAccount> uniqueAccountOpt = service.getOrCreateAccount(uuid);
 
                 if(uniqueAccountOpt.isPresent())
-                    account = new UniqueAccountConverter().convertToV8(serverRuntime, uniqueAccountOpt.get());
+                    account = uniqueAccountConverter.convertToV8(serverRuntime, uniqueAccountOpt.get());
             } catch (Exception e){
                 Optional<Account> accountOpt = service.getOrCreateAccount(parameters.getString(0));
 
                 if(accountOpt.isPresent())
-                    account = new AccountConverter().convertToV8(serverRuntime, accountOpt.get());
+                    account = accountConverter.convertToV8(serverRuntime, accountOpt.get());
             }
 
             return account;
