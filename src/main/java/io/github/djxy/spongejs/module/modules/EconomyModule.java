@@ -40,6 +40,7 @@ public class EconomyModule implements Module {
         }));
         economyService.add("getOrCreateAccount", new V8Function(serverRuntime, (receiver, parameters) -> {
             V8Object account = null;
+            
             try{
                 UUID uuid = UUID.fromString(parameters.getString(0));
                 Optional<UniqueAccount> uniqueAccountOpt = service.getOrCreateAccount(uuid);
