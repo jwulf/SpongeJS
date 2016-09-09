@@ -8,18 +8,16 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
-import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Created by Samuel on 2016-09-07.
  */
-public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
+public class AccountConverter extends ConverterV8Object<Account> {
 
     private static final CurrencyConverter currencyConverter = new CurrencyConverter();
     private static final BigDecimalConverter bigDecimalConverter = new BigDecimalConverter();
@@ -27,43 +25,38 @@ public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
     private static final TransactionResultConverter transactionResultConverter = new TransactionResultConverter();
     private static final CauseConverter causeConverter = new CauseConverter();
     private static final TextConverter textConverter = new TextConverter();
-    private static final AccountConverter accountConverter = new AccountConverter();
+    private static final UniqueAccountConverter uniqueAccountConverter = new UniqueAccountConverter();
 
     @Override
-    public V convertFromV8(Object o) {
+    public Account convertFromV8(Object o) {
         EconomyService service = Sponge.getServiceManager().provide(EconomyService.class).get();
+
+        Account account = uniqueAccountConverter.convertFromV8(o);
+
+        if(account != null)
+            return account;
+
         String identifier = null;
 
         if(o instanceof String)
             identifier = (String) o;
-        else if(o instanceof V8Object){
-            if(((V8Object) o).contains("getUniqueID"))
-                identifier = ((V8Object) o).executeStringFunction("getUniqueID", new V8Array(((V8Object) o).getRuntime()));
-            else
+        else if(o instanceof V8Object)
+            if(((V8Object) o).contains("getIdentifier"))
                 identifier = ((V8Object) o).executeStringFunction("getIdentifier", new V8Array(((V8Object) o).getRuntime()));
-        }
 
         if(identifier == null)
             throw new IllegalArgumentException("Should be a string or an account.");
 
-        try{
-            UUID uuid = UUID.fromString(identifier);
-            Optional<UniqueAccount> uniqueAccountOpt = service.getOrCreateAccount(uuid);
+        Optional<Account> accountOpt = service.getOrCreateAccount(identifier);
 
-            if(uniqueAccountOpt.isPresent())
-                return (V) uniqueAccountOpt.get();
-        } catch (Exception e){
-            Optional<Account> accountOpt = service.getOrCreateAccount(identifier);
-
-            if(accountOpt.isPresent())
-                return (V) accountOpt.get();
-        }
+        if(accountOpt.isPresent())
+            return accountOpt.get();
 
         return null;
     }
 
     @Override
-    protected V8Object setV8Object(V8Object v8Object, V8 v8, V account) {
+    protected void setV8Object(V8Object v8Object, V8 v8, Account account) {
         v8Object.add("getIdentifier", new V8Function(v8, (receiver, parameters) -> account.getIdentifier()));
         v8Object.add("deposit", new V8Function(v8, (receiver, parameters) -> {
             TransactionResult transactionResult = null;
@@ -181,9 +174,9 @@ public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
             TransactionResult transactionResult = null;
 
             if(parameters.length() == 4)
-                transactionResult = account.transfer(accountConverter.convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(1)), bigDecimalConverter.convertFromV8(parameters.get(2)), causeConverter.convertFromV8(parameters.get(3)));
+                transactionResult = account.transfer(convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(1)), bigDecimalConverter.convertFromV8(parameters.get(2)), causeConverter.convertFromV8(parameters.get(3)));
             if(parameters.length() == 5)
-                transactionResult = account.transfer(accountConverter.convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(1)), bigDecimalConverter.convertFromV8(parameters.get(2)), causeConverter.convertFromV8(parameters.get(3)), contextConverter.convertSetFromV8(parameters.get(4)));
+                transactionResult = account.transfer(convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(1)), bigDecimalConverter.convertFromV8(parameters.get(2)), causeConverter.convertFromV8(parameters.get(3)), contextConverter.convertSetFromV8(parameters.get(4)));
 
             return transactionResult == null?null:transactionResultConverter.convertToV8(v8, transactionResult);
         }));
@@ -198,8 +191,6 @@ public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
 
             return transactionResult == null?null:transactionResultConverter.convertToV8(v8, transactionResult);
         }));
-
-        return v8Object;
     }
 
 }

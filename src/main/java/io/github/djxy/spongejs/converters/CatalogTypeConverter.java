@@ -8,14 +8,12 @@ import org.spongepowered.api.CatalogType;
 /**
  * Created by Samuel on 2016-09-07.
  */
-public class CatalogTypeConverter<V extends CatalogType> extends ConverterV8Object<V> {
+public class CatalogTypeConverter extends ConverterV8Object<CatalogType> {
 
     @Override
-    protected V8Object setV8Object(V8Object v8Object, V8 v8, V v) {
+    protected void setV8Object(V8Object v8Object, V8 v8, CatalogType v) {
         v8Object.add("getId", new V8Function(v8, (receiver, parameters) -> v.getId()));
         v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> v.getName()));
-
-        return v8Object;
     }
 
 }

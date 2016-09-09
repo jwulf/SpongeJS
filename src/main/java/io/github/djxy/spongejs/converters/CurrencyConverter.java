@@ -11,10 +11,12 @@ import org.spongepowered.api.service.economy.EconomyService;
 /**
  * Created by Samuel on 2016-09-07.
  */
-public class CurrencyConverter extends CatalogTypeConverter<Currency> {
+public class CurrencyConverter extends ConverterV8Object<Currency> {
+
+    private final static CatalogTypeConverter catalogTypeConverter = new CatalogTypeConverter();
 
     @Override
-    protected V8Object setV8Object(V8Object v8Object, V8 v8, Currency currency) {
+    protected void setV8Object(V8Object v8Object, V8 v8, Currency currency) {
         TextConverter textConverter = new TextConverter();
 
         v8Object.add("format", new V8Function(v8, (receiver, parameters) -> {
@@ -30,8 +32,6 @@ public class CurrencyConverter extends CatalogTypeConverter<Currency> {
         v8Object.add("getPluralDisplayName", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getPluralDisplayName())));
         v8Object.add("getSymbol", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getSymbol())));
         v8Object.add("isDefault", new V8Function(v8, (receiver, parameters) -> currency.isDefault()));
-
-        return super.setV8Object(v8Object, v8, currency);
     }
 
     @Override
