@@ -22,7 +22,7 @@ import java.util.UUID;
 public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
 
     private static final CurrencyConverter currencyConverter = new CurrencyConverter();
-    private static  final BigDecimalConverter bigDecimalConverter = new BigDecimalConverter();
+    private static final BigDecimalConverter bigDecimalConverter = new BigDecimalConverter();
     private static final ContextConverter contextConverter = new ContextConverter();
     private static final TransactionResultConverter transactionResultConverter = new TransactionResultConverter();
     private static final CauseConverter causeConverter = new CauseConverter();
@@ -39,6 +39,8 @@ public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
         else if(o instanceof V8Object){
             if(((V8Object) o).contains("getUniqueID"))
                 identifier = ((V8Object) o).executeStringFunction("getUniqueID", new V8Array(((V8Object) o).getRuntime()));
+            else
+                identifier = ((V8Object) o).executeStringFunction("getIdentifier", new V8Array(((V8Object) o).getRuntime()));
         }
 
         if(identifier == null)
@@ -62,6 +64,7 @@ public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
 
     @Override
     protected V8Object setV8Object(V8Object v8Object, V8 v8, V account) {
+        v8Object.add("getIdentifier", new V8Function(v8, (receiver, parameters) -> account.getIdentifier()));
         v8Object.add("deposit", new V8Function(v8, (receiver, parameters) -> {
             TransactionResult transactionResult = null;
 
@@ -178,9 +181,9 @@ public class AccountConverter<V extends Account> extends ConverterV8Object<V> {
             TransactionResult transactionResult = null;
 
             if(parameters.length() == 4)
-                transactionResult = account.transfer(accountConverter.convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(0)), bigDecimalConverter.convertFromV8(parameters.get(1)), causeConverter.convertFromV8(parameters.get(2)));
+                transactionResult = account.transfer(accountConverter.convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(1)), bigDecimalConverter.convertFromV8(parameters.get(2)), causeConverter.convertFromV8(parameters.get(3)));
             if(parameters.length() == 5)
-                transactionResult = account.transfer(accountConverter.convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(0)), bigDecimalConverter.convertFromV8(parameters.get(1)), causeConverter.convertFromV8(parameters.get(2)), contextConverter.convertSetFromV8(parameters.get(3)));
+                transactionResult = account.transfer(accountConverter.convertFromV8(parameters.get(0)), currencyConverter.convertFromV8(parameters.get(1)), bigDecimalConverter.convertFromV8(parameters.get(2)), causeConverter.convertFromV8(parameters.get(3)), contextConverter.convertSetFromV8(parameters.get(4)));
 
             return transactionResult == null?null:transactionResultConverter.convertToV8(v8, transactionResult);
         }));
