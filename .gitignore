@@ -1,0 +1,5 @@
+/target
+/.idea
+nodeJS/.idea
+nodeJS/node_modules
+*.iml
