@@ -5,12 +5,9 @@ import io.github.djxy.spongejs.module.modules.EconomyModule;
 import io.github.djxy.spongejs.util.LibraryLoader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.economy.EconomyTransactionEvent;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.text.Text;
 
 import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
@@ -40,13 +37,6 @@ public class SpongeJS {
         server.init();
         server.getRuntime().add("serverCause", "SpongeJS");
         server.start();
-    }
-
-    @Listener
-    public void onTransaction(EconomyTransactionEvent event){
-        if(event.getTransactionResult().getAccount() instanceof UniqueAccount){
-            Sponge.getServer().getPlayer(((UniqueAccount) event.getTransactionResult().getAccount()).getUniqueId()).get().sendMessage(Text.of("You have received "+event.getTransactionResult().getAmount().doubleValue()+event.getTransactionResult().getCurrency().getSymbol()));
-        }
     }
 
     private static void initV8(){
