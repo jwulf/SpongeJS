@@ -9,6 +9,11 @@ import org.spongepowered.api.text.Text;
 public class TextConverter extends Converter<Text, String> {
 
     @Override
+    public Text convertFromV8(Object o) {
+        return Text.of(o);
+    }
+
+    @Override
     public String convertToV8(V8 v8, Text text) {
         return text.toPlain();
     }
