@@ -32,6 +32,8 @@ public class CurrencyConverter extends ConverterV8Object<Currency> {
         v8Object.add("getPluralDisplayName", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getPluralDisplayName())));
         v8Object.add("getSymbol", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getSymbol())));
         v8Object.add("isDefault", new V8Function(v8, (receiver, parameters) -> currency.isDefault()));
+
+        catalogTypeConverter.setV8Object(v8Object, v8, currency);
     }
 
     @Override
