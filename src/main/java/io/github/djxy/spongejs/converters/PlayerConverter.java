@@ -2,6 +2,7 @@ package io.github.djxy.spongejs.converters;
 
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
+import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -26,10 +27,12 @@ public class PlayerConverter extends ConverterV8Object<Player> {
         else if(o instanceof V8Object){
             if(((V8Object) o).contains("getIdentifier"))
                 identifier = ((V8Object) o).executeStringFunction("getIdentifier", new V8Array(((V8Object) o).getRuntime()));
+            else if(((V8Object) o).contains("getUniqueID"))
+                identifier = ((V8Object) o).executeStringFunction("getUniqueID", new V8Array(((V8Object) o).getRuntime()));
         }
 
         if(identifier == null)
-            throw new IllegalArgumentException("Should be a string or a Player.");
+            throw new IllegalArgumentException("Should be a string, a UUID or a Player.");
 
         try{
             UUID uuid = UUID.fromString(identifier);
@@ -47,6 +50,12 @@ public class PlayerConverter extends ConverterV8Object<Player> {
     protected void setV8Object(V8Object v8Object, V8 v8, Player player) {
         identifiableConverter.setV8Object(v8Object, v8, player);
         commandSourceConverter.setV8Object(v8Object, v8, player);
+
+        v8Object.add("hasPlayedBefore", new V8Function(v8, (receiver, parameters) -> player.hasPlayedBefore()));
+        v8Object.add("kick", new V8Function(v8, (receiver, parameters) -> {
+            player.kick();
+            return null;
+        }));
     }
 
 }
