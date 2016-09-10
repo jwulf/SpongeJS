@@ -6,6 +6,7 @@ import org.spongepowered.api.event.cause.Cause;
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = Cause.class, isV8Primitive = true)
 public class CauseConverter extends Converter<Cause, String> {
 
     @Override

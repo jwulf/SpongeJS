@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = BigDecimal.class, isV8Primitive = true)
 public class BigDecimalConverter extends Converter<BigDecimal, Double> {
 
     @Override

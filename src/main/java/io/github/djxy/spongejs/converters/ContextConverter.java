@@ -12,29 +12,11 @@ import java.util.Set;
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = Context.class)
 public class ContextConverter extends ConverterV8Object<Context> {
 
-    public V8Array convertSetToV8(V8 v8, Set<Context> contextSet){
-        V8Array v8Array = new V8Array(v8);
-
-        for(Context context : contextSet)
-            v8Array.push(convertToV8(v8, context));
-
-        return v8Array;
-    }
-
-    public Set<Context> convertSetFromV8(Object o){
-        Set<Context> contexts = new HashSet<>();
-        V8Array v8Array = (V8Array) o;
-
-        for(int i = 0; i < v8Array.length(); i++)
-            contexts.add(convertFromV8(v8Array.get(i)));
-
-        return contexts;
-    }
-
     @Override
-    protected void setV8Object(V8Object v8Object, V8 v8, Context context) {
+    public void setV8Object(V8Object v8Object, V8 v8, Context context) {
         v8Object.add("getKey", new V8Function(v8, (receiver, parameters) -> context.getKey()));
         v8Object.add("getValue", new V8Function(v8, (receiver, parameters) -> context.getValue()));
         v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> context.getName()));

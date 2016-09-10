@@ -6,22 +6,20 @@ import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 
 /**
  * Created by samuelmarchildon-lavoie on 16-09-09.
  */
+@ConverterInfo(type = CommandSource.class)
 public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
-
-    private static final ContextualConverter contextualConverter = new ContextualConverter();
-    private static final PlayerConverter playerConverter = new PlayerConverter();
-    private static final MessageReceiverConverter messageReceiverConverter = new MessageReceiverConverter();
 
     @Override
     public CommandSource convertFromV8(Object o) {
         String identifier = null;
 
         try{
-            CommandSource player = playerConverter.convertFromV8(o);
+            CommandSource player = Converter.convertFromV8(Player.class, o);
 
             if(player != null)
                 return player;
@@ -47,8 +45,6 @@ public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
 
     @Override
     public void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource) {
-        contextualConverter.setV8Object(v8Object, v8, commandSource);
-        messageReceiverConverter.setV8Object(v8Object, v8, commandSource);
         v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> commandSource.getName()));
     }
 

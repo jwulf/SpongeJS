@@ -13,10 +13,8 @@ import java.util.UUID;
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = UniqueAccount.class)
 public class UniqueAccountConverter extends ConverterV8Object<UniqueAccount> {
-
-    private static final IdentifiableConverter identifiableConverter = new IdentifiableConverter();
-    private static final AccountConverter accountConverter = new AccountConverter();
 
     @Override
     public UniqueAccount convertFromV8(Object o) {
@@ -45,9 +43,6 @@ public class UniqueAccountConverter extends ConverterV8Object<UniqueAccount> {
     }
 
     @Override
-    protected void setV8Object(V8Object v8Object, V8 v8, UniqueAccount account) {
-        identifiableConverter.setV8Object(v8Object, v8, account);
-        accountConverter.setV8Object(v8Object, v8, account);
-    }
+    public void setV8Object(V8Object v8Object, V8 v8, UniqueAccount account) {}
 
 }

@@ -13,10 +13,8 @@ import java.util.UUID;
 /**
  * Created by samuelmarchildon-lavoie on 16-09-09.
  */
+@ConverterInfo(type = Player.class)
 public class PlayerConverter extends ConverterV8Object<Player> {
-
-    private static final CommandSourceConverter commandSourceConverter = new CommandSourceConverter();
-    private static final IdentifiableConverter identifiableConverter = new IdentifiableConverter();
 
     @Override
     public Player convertFromV8(Object o) {
@@ -47,10 +45,7 @@ public class PlayerConverter extends ConverterV8Object<Player> {
     }
 
     @Override
-    protected void setV8Object(V8Object v8Object, V8 v8, Player player) {
-        identifiableConverter.setV8Object(v8Object, v8, player);
-        commandSourceConverter.setV8Object(v8Object, v8, player);
-
+    public void setV8Object(V8Object v8Object, V8 v8, Player player) {
         v8Object.add("hasPlayedBefore", new V8Function(v8, (receiver, parameters) -> player.hasPlayedBefore()));
         v8Object.add("kick", new V8Function(v8, (receiver, parameters) -> {
             player.kick();

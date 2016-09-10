@@ -7,33 +7,31 @@ import com.eclipsesource.v8.V8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.text.Text;
+
+import java.math.BigDecimal;
 
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = Currency.class)
 public class CurrencyConverter extends ConverterV8Object<Currency> {
 
-    private final static CatalogTypeConverter catalogTypeConverter = new CatalogTypeConverter();
-
     @Override
-    protected void setV8Object(V8Object v8Object, V8 v8, Currency currency) {
-        TextConverter textConverter = new TextConverter();
-
+    public void setV8Object(V8Object v8Object, V8 v8, Currency currency) {
         v8Object.add("format", new V8Function(v8, (receiver, parameters) -> {
             if(parameters.length() == 1)
-                return textConverter.convertToV8(v8, currency.format(new BigDecimalConverter().convertFromV8(parameters.get(0))));
+                return Converter.convertToV8(v8, Text.class, currency.format(Converter.convertFromV8(BigDecimal.class, parameters.get(0))));
             else if(parameters.length() == 2)
-                return textConverter.convertToV8(v8, currency.format(new BigDecimalConverter().convertFromV8(parameters.get(0)), parameters.getInteger(1)));
+                return Converter.convertToV8(v8, Text.class, currency.format(Converter.convertFromV8(BigDecimal.class, parameters.get(0)), parameters.getInteger(1)));
             else
                 return null;
         }));
         v8Object.add("getDefaultFractionDigits", new V8Function(v8, (receiver, parameters) -> currency.getDefaultFractionDigits()));
-        v8Object.add("getDisplayName", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getDisplayName())));
-        v8Object.add("getPluralDisplayName", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getPluralDisplayName())));
-        v8Object.add("getSymbol", new V8Function(v8, (receiver, parameters) -> textConverter.convertToV8(v8, currency.getSymbol())));
+        v8Object.add("getDisplayName", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getDisplayName())));
+        v8Object.add("getPluralDisplayName", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getPluralDisplayName())));
+        v8Object.add("getSymbol", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getSymbol())));
         v8Object.add("isDefault", new V8Function(v8, (receiver, parameters) -> currency.isDefault()));
-
-        catalogTypeConverter.setV8Object(v8Object, v8, currency);
     }
 
     @Override

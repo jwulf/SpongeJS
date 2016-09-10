@@ -6,6 +6,7 @@ import org.spongepowered.api.text.Text;
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = Text.class, isV8Primitive = true)
 public class TextConverter extends Converter<Text, String> {
 
     @Override

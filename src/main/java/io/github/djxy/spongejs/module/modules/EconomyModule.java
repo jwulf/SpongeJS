@@ -1,12 +1,7 @@
 package io.github.djxy.spongejs.module.modules;
 
-import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Function;
-import com.eclipsesource.v8.V8Object;
-import io.github.djxy.spongejs.converters.AccountConverter;
-import io.github.djxy.spongejs.converters.CurrencyConverter;
-import io.github.djxy.spongejs.converters.UniqueAccountConverter;
+import com.eclipsesource.v8.*;
+import io.github.djxy.spongejs.converters.Converter;
 import io.github.djxy.spongejs.module.Module;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.Currency;
@@ -22,38 +17,34 @@ import java.util.UUID;
  */
 public class EconomyModule implements Module {
 
-    private static final CurrencyConverter currencyConverter = new CurrencyConverter();
-    private static final AccountConverter accountConverter = new AccountConverter();
-    private static final UniqueAccountConverter uniqueAccountConverter = new UniqueAccountConverter();
-
     @Override
     public void initilize(V8 serverRuntime) {
         V8Object economyService = new V8Object(serverRuntime);
         EconomyService service = Sponge.getServiceManager().provide(EconomyService.class).get();
 
-        economyService.add("getDefaultCurrency", new V8Function(serverRuntime, (receiver, parameters) -> currencyConverter.convertToV8(serverRuntime, service.getDefaultCurrency())));
+        economyService.add("getDefaultCurrency", new V8Function(serverRuntime, (receiver, parameters) -> Converter.convertToV8(serverRuntime, Currency.class, service.getDefaultCurrency())));
         economyService.add("getCurrencies", new V8Function(serverRuntime, (receiver, parameters) -> {
             V8Array v8Array = new V8Array(serverRuntime);
 
             for(Currency currency : service.getCurrencies())
-                v8Array.push(currencyConverter.convertToV8(serverRuntime, currency));
+                v8Array.push((V8Value) Converter.convertToV8(serverRuntime, Currency.class, currency));
 
             return v8Array;
         }));
         economyService.add("getOrCreateAccount", new V8Function(serverRuntime, (receiver, parameters) -> {
-            V8Object account = null;
+            Object account = null;
 
             try{
                 UUID uuid = UUID.fromString(parameters.getString(0));
                 Optional<UniqueAccount> uniqueAccountOpt = service.getOrCreateAccount(uuid);
 
                 if(uniqueAccountOpt.isPresent())
-                    account = uniqueAccountConverter.convertToV8(serverRuntime, uniqueAccountOpt.get());
+                    account = Converter.convertToV8(serverRuntime, UniqueAccount.class, uniqueAccountOpt.get());
             } catch (Exception e){
                 Optional<Account> accountOpt = service.getOrCreateAccount(parameters.getString(0));
 
                 if(accountOpt.isPresent())
-                    account = accountConverter.convertToV8(serverRuntime, accountOpt.get());
+                    account = Converter.convertToV8(serverRuntime, Account.class, accountOpt.get());
             }
 
             return account;

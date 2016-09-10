@@ -1,10 +1,7 @@
 package io.github.djxy.spongejs.module.modules;
 
-import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Function;
-import com.eclipsesource.v8.V8Object;
-import io.github.djxy.spongejs.converters.PlayerConverter;
+import com.eclipsesource.v8.*;
+import io.github.djxy.spongejs.converters.Converter;
 import io.github.djxy.spongejs.module.Module;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
@@ -15,8 +12,6 @@ import org.spongepowered.api.entity.living.player.Player;
  */
 public class ServerModule implements Module {
 
-    private static final PlayerConverter playerConverter = new PlayerConverter();
-
     @Override
     public void initilize(V8 serverRuntime) {
         V8Object serverModule = new V8Object(serverRuntime);
@@ -26,11 +21,11 @@ public class ServerModule implements Module {
             V8Array v8Array = new V8Array(serverRuntime);
 
             for(Player player : server.getOnlinePlayers())
-                v8Array.push(playerConverter.convertToV8(serverRuntime, player));
+                v8Array.push((V8Value) Converter.convertToV8(serverRuntime, Player.class, player));
 
             return v8Array;
         }));
-        serverModule.add("getPlayer", new V8Function(serverRuntime, (receiver, parameters) -> playerConverter.convertToV8(serverRuntime, playerConverter.convertFromV8(parameters.get(0)))));
+        serverModule.add("getPlayer", new V8Function(serverRuntime, (receiver, parameters) -> Converter.convertToV8(serverRuntime, Player.class, Converter.convertFromV8(Player.class, parameters.get(0)))));
 
         serverRuntime.add("spongeServer", serverModule);
     }

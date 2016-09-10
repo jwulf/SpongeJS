@@ -6,6 +6,7 @@ import org.spongepowered.api.service.economy.transaction.ResultType;
 /**
  * Created by Samuel on 2016-09-07.
  */
+@ConverterInfo(type = ResultType.class, isV8Primitive = true)
 public class ResultTypeConverter extends Converter<ResultType, String> {
 
     @Override

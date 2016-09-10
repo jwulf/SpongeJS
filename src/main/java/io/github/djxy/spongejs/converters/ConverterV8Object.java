@@ -8,8 +8,9 @@ import com.eclipsesource.v8.V8Object;
  */
 public abstract class ConverterV8Object<V> extends Converter<V, V8Object> {
 
-    abstract protected void setV8Object(V8Object v8Object, V8 v8, V v);
+    public abstract void setV8Object(V8Object v8Object, V8 v8, V v);
 
+    @Override
     public V8Object convertToV8(V8 v8, V v){
         V8Object v8Object = new V8Object(v8);
 
