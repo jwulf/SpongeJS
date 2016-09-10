@@ -18,7 +18,7 @@ import java.util.UUID;
 public class EconomyModule implements Module {
 
     @Override
-    public void initilize(V8 serverRuntime) {
+    public void initialize(V8 serverRuntime) {
         V8Object economyService = new V8Object(serverRuntime);
         EconomyService service = Sponge.getServiceManager().provide(EconomyService.class).get();
 

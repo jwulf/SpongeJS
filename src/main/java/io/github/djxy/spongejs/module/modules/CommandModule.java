@@ -14,7 +14,7 @@ import org.spongepowered.api.command.CommandSource;
 public class CommandModule implements Module {
 
     @Override
-    public void initilize(V8 serverRuntime) {
+    public void initialize(V8 serverRuntime) {
         V8Object commandManager = new V8Object(serverRuntime);
         CommandManager manager = Sponge.getCommandManager();
 

@@ -13,7 +13,7 @@ import org.spongepowered.api.entity.living.player.Player;
 public class ServerModule implements Module {
 
     @Override
-    public void initilize(V8 serverRuntime) {
+    public void initialize(V8 serverRuntime) {
         V8Object serverModule = new V8Object(serverRuntime);
         Server server = Sponge.getServer();
 

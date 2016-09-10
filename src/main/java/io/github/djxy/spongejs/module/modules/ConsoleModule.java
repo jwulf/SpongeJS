@@ -16,7 +16,7 @@ public class ConsoleModule implements Module {
      * @param serverRuntime
      */
     @Override
-    public void initilize(V8 serverRuntime) {
+    public void initialize(V8 serverRuntime) {
         Converter.editV8Object(serverRuntime.getObject("console"), CommandSource.class, Sponge.getServer().getConsole());
     }
 

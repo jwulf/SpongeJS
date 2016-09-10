@@ -37,7 +37,7 @@ public final class Server {
         nodeJS = NodeJS.createNodeJS();
 
         for(Module module : modules)
-            module.initilize(getRuntime());
+            module.initialize(getRuntime());
     }
 
     public synchronized void start(){

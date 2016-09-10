@@ -7,6 +7,6 @@ import com.eclipsesource.v8.V8;
  */
 public interface Module {
 
-    public void initilize(V8 serverRuntime);
+    public void initialize(V8 serverRuntime);
 
 }
