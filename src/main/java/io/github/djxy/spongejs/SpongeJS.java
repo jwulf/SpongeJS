@@ -1,6 +1,7 @@
 package io.github.djxy.spongejs;
 
 import com.eclipsesource.v8.V8;
+import io.github.djxy.spongejs.converters.Converter;
 import io.github.djxy.spongejs.module.modules.CommandModule;
 import io.github.djxy.spongejs.module.modules.ConsoleModule;
 import io.github.djxy.spongejs.module.modules.EconomyModule;
@@ -12,6 +13,7 @@ import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.plugin.Plugin;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
 
@@ -26,7 +28,7 @@ public class SpongeJS {
 
     @Listener
     public void onGameConstructionEvent(GameConstructionEvent event){
-        initV8();
+        init();
 
         server = new Server(FileSystems.getDefault().getPath("nodeJS", "bin", "www"));
         service  = new SpongeJSService(server);
@@ -45,7 +47,7 @@ public class SpongeJS {
         server.start();
     }
 
-    private static void initV8(){
+    private static void init(){
         try {
             Field field = V8.class.getDeclaredField("nativeLibraryLoaded");
             field.setAccessible(true);
@@ -53,6 +55,8 @@ public class SpongeJS {
             field.setAccessible(false);
             LibraryLoader.loadLibraryFromJar();
         } catch (Exception e){e.printStackTrace();}
+
+        Converter.init();
     }
 
 }
