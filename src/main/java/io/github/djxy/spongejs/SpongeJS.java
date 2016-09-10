@@ -2,7 +2,9 @@ package io.github.djxy.spongejs;
 
 import com.eclipsesource.v8.V8;
 import io.github.djxy.spongejs.module.modules.CommandModule;
+import io.github.djxy.spongejs.module.modules.ConsoleModule;
 import io.github.djxy.spongejs.module.modules.EconomyModule;
+import io.github.djxy.spongejs.module.modules.ServerModule;
 import io.github.djxy.spongejs.util.LibraryLoader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
@@ -36,6 +38,8 @@ public class SpongeJS {
     public void onGameAboutToStartServerEvent(GameAboutToStartServerEvent event){
         server.addModule(new EconomyModule());
         server.addModule(new CommandModule());
+        server.addModule(new ConsoleModule());
+        server.addModule(new ServerModule());
         server.init();
         server.getRuntime().add("serverCause", "SpongeJS");
         server.start();
