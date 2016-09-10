@@ -19,6 +19,7 @@ import java.util.Optional;
  */
 public class AccountConverter extends ConverterV8Object<Account> {
 
+    private static final ContextualConverter contextualConverter = new ContextualConverter();
     private static final CurrencyConverter currencyConverter = new CurrencyConverter();
     private static final BigDecimalConverter bigDecimalConverter = new BigDecimalConverter();
     private static final ContextConverter contextConverter = new ContextConverter();
@@ -59,7 +60,7 @@ public class AccountConverter extends ConverterV8Object<Account> {
 
     @Override
     protected void setV8Object(V8Object v8Object, V8 v8, Account account) {
-        v8Object.add("getIdentifier", new V8Function(v8, (receiver, parameters) -> account.getIdentifier()));
+        contextualConverter.setV8Object(v8Object, v8, account);
         v8Object.add("deposit", new V8Function(v8, (receiver, parameters) -> {
             TransactionResult transactionResult = null;
 
