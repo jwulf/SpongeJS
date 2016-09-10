@@ -31,10 +31,12 @@ public class AccountConverter extends ConverterV8Object<Account> {
     public Account convertFromV8(Object o) {
         EconomyService service = Sponge.getServiceManager().provide(EconomyService.class).get();
 
-        Account account = uniqueAccountConverter.convertFromV8(o);
+        try{
+            Account account = uniqueAccountConverter.convertFromV8(o);
 
-        if(account != null)
-            return account;
+            if(account != null)
+                return account;
+        } catch (IllegalArgumentException e){}
 
         String identifier = null;
 
