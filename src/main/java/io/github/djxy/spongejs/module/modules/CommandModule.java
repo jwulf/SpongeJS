@@ -25,10 +25,6 @@ public class CommandModule implements Module {
             if(parameters.length() != 2)
                 return null;
 
-            if(serverRuntime.getObject("console").equals(parameters.get(0)))
-                return commandResultConverter.convertToV8(serverRuntime, manager.process(Sponge.getServer().getConsole(), parameters.getString(1)));
-
-
             CommandSource source = commandSourceConverter.convertFromV8(parameters.get(0));
 
             if(source != null)
