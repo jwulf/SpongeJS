@@ -46,7 +46,7 @@ public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
     }
 
     @Override
-    protected void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource) {
+    public void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource) {
         contextualConverter.setV8Object(v8Object, v8, commandSource);
         messageReceiverConverter.setV8Object(v8Object, v8, commandSource);
         v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> commandSource.getName()));
