@@ -19,20 +19,24 @@ public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
     public CommandSource convertFromV8(Object o) {
         String identifier = null;
 
-        CommandSource player = playerConverter.convertFromV8(o);
+        try{
+            CommandSource player = playerConverter.convertFromV8(o);
 
-        if(player != null)
-            return player;
+            if(player != null)
+                return player;
+        } catch (IllegalArgumentException e){}
 
         if(o instanceof String)
             identifier = (String) o;
         else if(o instanceof V8Object){
+            if(((V8Object) o).getRuntime().getObject("console").equals(o))
+                return Sponge.getServer().getConsole();
             if(((V8Object) o).contains("getIdentifier"))
                 identifier = ((V8Object) o).executeStringFunction("getIdentifier", new V8Array(((V8Object) o).getRuntime()));
         }
 
         if(identifier == null)
-            throw new IllegalArgumentException("Should be a string or a commandSource.");
+            throw new IllegalArgumentException("Should be a string, the console or a commandSource.");
 
         if(Sponge.getServer().getConsole().getIdentifier().equals(identifier))
             return Sponge.getServer().getConsole();
