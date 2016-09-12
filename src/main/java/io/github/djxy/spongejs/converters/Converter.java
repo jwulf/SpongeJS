@@ -7,8 +7,10 @@ import com.eclipsesource.v8.V8Value;
 import com.google.common.reflect.ClassPath;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,14 +22,14 @@ public abstract class Converter<V, T> {
     private static HashMap<Class, V8ObjectCreator> objectCreators = new HashMap<>();
 
     public static <Y extends Object> Y convertFromV8(Class<Y> type, Object o){
-        if(!converters.containsKey(type))
+        if(!converters.containsKey(type) || o == null)
             return null;
 
         return (Y) converters.get(type).convertFromV8(o);
     }
 
     public static <Y extends Object> Object convertToV8(V8 v8, Class<Y> type, Y o){
-        if(!objectCreators.containsKey(type))
+        if(!objectCreators.containsKey(type) || o == null)
             return null;
 
         return objectCreators.get(type).createV8Object(v8, o);
@@ -64,12 +66,46 @@ public abstract class Converter<V, T> {
         return array;
     }
 
+    public static <Y extends Object> Object convertListToV8(V8 v8, Class<Y> type, List<Y> o){
+        if(!objectCreators.containsKey(type))
+            return null;
+
+        V8Array array = new V8Array(v8);
+
+        for(Y y : o){
+            Object object = objectCreators.get(type).createV8Object(v8, y);
+
+            if(object instanceof V8Value)
+                array.push((V8Value) object);
+            else if(object instanceof String)
+                array.push((String) object);
+            else if(object instanceof Integer)
+                array.push((Integer) object);
+            else if(object instanceof Double)
+                array.push((Double) object);
+            else if(object instanceof Boolean)
+                array.push((Boolean) object);
+        }
+
+        return array;
+    }
+
+    public static <Y extends Object> List<Y> convertListFromV8(Class<Y> type, Object o){
+        List<Y> list = new ArrayList<>();
+        V8Array v8Array = (V8Array) o;
+
+        for(int i = 0; i < v8Array.length(); i++)
+            list.add(convertFromV8(type, v8Array.get(i)));
+
+        return list;
+    }
+
     public static <Y extends Object> Set<Y> convertSetFromV8(Class<Y> type, Object o){
         Set<Y> set = new HashSet<>();
         V8Array v8Array = (V8Array) o;
 
         for(int i = 0; i < v8Array.length(); i++)
-            set.add((Y) convertFromV8(type, v8Array.get(i)));
+            set.add(convertFromV8(type, v8Array.get(i)));
 
         return set;
     }
