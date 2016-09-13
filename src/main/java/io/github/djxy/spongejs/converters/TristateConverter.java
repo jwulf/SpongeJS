@@ -16,8 +16,6 @@ public class TristateConverter extends Converter<Tristate, Boolean> {
             return Tristate.FALSE;
         if(o.equals(true))
             return Tristate.TRUE;
-        if(o == null)
-            return Tristate.UNDEFINED;
 
         return null;
     }
