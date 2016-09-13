@@ -5,7 +5,9 @@ import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.V8Value;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 
@@ -16,6 +18,23 @@ import java.util.Map;
  */
 @ConverterInfo(type = SubjectCollection.class)
 public class SubjectCollectionConverter extends ConverterV8Object<SubjectCollection>{
+
+    @Override
+    public SubjectCollection convertFromV8(Object o) {
+        if(!(o instanceof V8Object))
+            throw new IllegalArgumentException("Should be a SubjectCollection.");
+
+        V8Object v8Object = (V8Object) o;
+
+        if(!v8Object.contains("getIdentifier"))
+            return null;
+
+        String collectionName = v8Object.executeStringFunction("getIdentifier", new V8Array(v8Object.getRuntime()));
+
+        PermissionService service = Sponge.getServiceManager().provide(PermissionService.class).get();
+
+        return service.getKnownSubjects().get(collectionName);
+    }
 
     @Override
     public void setV8Object(V8Object v8Object, V8 v8, SubjectCollection collection) {

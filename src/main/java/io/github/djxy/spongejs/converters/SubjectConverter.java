@@ -1,6 +1,7 @@
 package io.github.djxy.spongejs.converters;
 
 import com.eclipsesource.v8.V8;
+import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import org.spongepowered.api.service.context.Context;
@@ -17,7 +18,20 @@ public class SubjectConverter extends ConverterV8Object<Subject>{
 
     @Override
     public Subject convertFromV8(Object o) {
-        return super.convertFromV8(o);
+        if(!(o instanceof V8Object))
+            throw new IllegalArgumentException("Should be a Subject.");
+
+        V8Object v8Object = (V8Object) o;
+
+        if(!v8Object.contains("getContainingCollection") || !v8Object.contains("getIdentifier"))
+            return null;
+
+        SubjectCollection collection = Converter.convertFromV8(SubjectCollection.class, v8Object.executeObjectFunction("getContainingCollection", new V8Array(v8Object.getRuntime())));
+
+        if(collection == null)
+            return null;
+
+        return collection.get(v8Object.executeStringFunction("getIdentifier", new V8Array(v8Object.getRuntime())));
     }
 
     @Override
