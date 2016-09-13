@@ -47,9 +47,9 @@ public class SubjectConverter extends ConverterV8Object<Subject>{
         }));
         v8Object.add("getParents", new V8Function(v8, (receiver, parameters) -> {
             if (parameters.length() == 0)
-                return Converter.convertListToV8(v8, Subject.class, subject.getParents());
+                return Converter.convertIterableToV8(v8, Subject.class, subject.getParents());
             if (parameters.length() == 1)
-                return Converter.convertListToV8(v8, Subject.class, subject.getParents(Converter.convertSetFromV8(Context.class, parameters.get(0))));
+                return Converter.convertIterableToV8(v8, Subject.class, subject.getParents(Converter.convertSetFromV8(Context.class, parameters.get(0))));
 
             return null;
         }));

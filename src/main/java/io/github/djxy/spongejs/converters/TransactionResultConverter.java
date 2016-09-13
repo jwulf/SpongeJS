@@ -30,7 +30,7 @@ public class TransactionResultConverter extends ConverterV8Object<TransactionRes
 
         v8Object.add("getAmount", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, BigDecimal.class, transactionResult.getAmount())));
 
-        v8Object.add("getContexts", new V8Function(v8, (receiver, parameters) -> Converter.convertSetToV8(v8, Context.class, transactionResult.getContexts())));
+        v8Object.add("getContexts", new V8Function(v8, (receiver, parameters) -> Converter.convertIterableToV8(v8, Context.class, transactionResult.getContexts())));
 
         v8Object.add("getCurrency", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Currency.class, transactionResult.getCurrency())));
 

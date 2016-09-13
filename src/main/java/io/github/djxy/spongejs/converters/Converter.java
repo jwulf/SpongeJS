@@ -42,31 +42,7 @@ public abstract class Converter<V, T> {
         return ((V8ObjectCreatorV8Object)objectCreators.get(type)).editV8Object(object, o);
     }
 
-    public static <Y extends Object> Object convertSetToV8(V8 v8, Class<Y> type, Set<Y> o){
-        if(!objectCreators.containsKey(type))
-            return null;
-
-        V8Array array = new V8Array(v8);
-
-        for(Y y : o){
-            Object object = objectCreators.get(type).createV8Object(v8, y);
-
-            if(object instanceof V8Value)
-                array.push((V8Value) object);
-            else if(object instanceof String)
-                array.push((String) object);
-            else if(object instanceof Integer)
-                array.push((Integer) object);
-            else if(object instanceof Double)
-                array.push((Double) object);
-            else if(object instanceof Boolean)
-                array.push((Boolean) object);
-        }
-
-        return array;
-    }
-
-    public static <Y extends Object> Object convertListToV8(V8 v8, Class<Y> type, List<Y> o){
+    public static <Y extends Object> Object convertIterableToV8(V8 v8, Class<Y> type, Iterable<Y> o){
         if(!objectCreators.containsKey(type))
             return null;
 
@@ -182,7 +158,7 @@ public abstract class Converter<V, T> {
             return;
 
         try {
-            for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses("io.github.djxy.spongejs.converters")) {
+            for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses()) {
                 Class clazz = info.load();
 
                 Annotation annotation = clazz.getAnnotation(ConverterInfo.class);
