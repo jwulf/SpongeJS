@@ -8,7 +8,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConverterInfo {
-    public String pluginId() default "";
     public Class type();
     public boolean isV8Primitive() default false;//Should be true if return String, Integer, Double, Boolean
 }
