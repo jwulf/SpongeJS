@@ -34,17 +34,16 @@ public class SpongeJS {
 
     @Listener
     public void onGamePostInitializationEvent(GamePostInitializationEvent event){
-        init();
-
         serverPath = FileSystems.getDefault().getPath("nodeJS", "bin", "www");
 
-        if(serverPath.toFile().exists())
-            logger.info("NodeJS server found. Can start it.");
-        else
-            logger.error("NodeJS server not found. Make sure to have " + serverPath.toAbsolutePath()+".");
-
-        if(!serverPath.toFile().exists())
+        if(!serverPath.toFile().exists()) {
+            logger.error("NodeJS server not found. Make sure to have " + serverPath.toAbsolutePath());
             return;
+        }
+
+        logger.info("NodeJS server found.");
+
+        init();
 
         server = new Server(serverPath);
         service  = new SpongeJSService(server);
@@ -56,7 +55,7 @@ public class SpongeJS {
     public void onGameAboutToStartServerEvent(GameAboutToStartServerEvent event){
         if(!serverPath.toFile().exists())
             return;
-        
+
         server.addModule(new EconomyModule());
         server.addModule(new CommandModule());
         server.addModule(new ConsoleModule());
