@@ -156,7 +156,7 @@ public abstract class Converter<V, T> {
     public synchronized static void init(){
         if(!converters.isEmpty())
             return;
-        
+
         try {
             for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses("io.github.djxy.spongejs.converters")) {
                 Class clazz = info.load();
