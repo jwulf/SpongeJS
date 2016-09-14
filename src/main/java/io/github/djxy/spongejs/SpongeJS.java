@@ -3,10 +3,7 @@ package io.github.djxy.spongejs;
 import com.eclipsesource.v8.V8;
 import com.google.inject.Inject;
 import io.github.djxy.spongejs.converters.Converter;
-import io.github.djxy.spongejs.module.modules.CommandModule;
-import io.github.djxy.spongejs.module.modules.ConsoleModule;
-import io.github.djxy.spongejs.module.modules.EconomyModule;
-import io.github.djxy.spongejs.module.modules.ServerModule;
+import io.github.djxy.spongejs.module.modules.*;
 import io.github.djxy.spongejs.util.LibraryLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -56,6 +53,7 @@ public class SpongeJS {
         if(!serverPath.toFile().exists())
             return;
 
+        server.addModule(new PermissionModule());
         server.addModule(new EconomyModule());
         server.addModule(new CommandModule());
         server.addModule(new ConsoleModule());
