@@ -158,21 +158,19 @@ public abstract class Converter<V, T> {
             return;
         
         try {
-            for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses()) {
-                try{
-                    Class clazz = info.load();
+            for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses("io.github.djxy.spongejs.converters")) {
+                Class clazz = info.load();
 
-                    Annotation annotation = clazz.getAnnotation(ConverterInfo.class);
+                Annotation annotation = clazz.getAnnotation(ConverterInfo.class);
 
-                    if(annotation != null) {
-                        converters.put(((ConverterInfo) annotation).type(), (Converter) clazz.getConstructor().newInstance());
+                if(annotation != null) {
+                    converters.put(((ConverterInfo) annotation).type(), (Converter) clazz.getConstructor().newInstance());
 
-                        if(((ConverterInfo) annotation).isV8Primitive())
-                            objectCreators.put(((ConverterInfo) annotation).type(), new V8ObjectCreatorPrimitve(converters.get(((ConverterInfo) annotation).type())));
-                        else
-                            objectCreators.put(((ConverterInfo) annotation).type(), new V8ObjectCreatorV8Object());
-                    }
-                } catch (Exception | Error e){}
+                    if(((ConverterInfo) annotation).isV8Primitive())
+                        objectCreators.put(((ConverterInfo) annotation).type(), new V8ObjectCreatorPrimitve(converters.get(((ConverterInfo) annotation).type())));
+                    else
+                        objectCreators.put(((ConverterInfo) annotation).type(), new V8ObjectCreatorV8Object());
+                }
             }
 
             initObjectCreators();
