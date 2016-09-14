@@ -13,6 +13,7 @@ import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
 
@@ -28,6 +29,8 @@ public class SpongeJS {
     @Listener
     public void onGamePostInitializationEvent(GamePostInitializationEvent event){
         init();
+
+        System.out.println(FileSystems.getDefault().getPath("nodeJS", "bin", "www").toFile().exists());
 
         server = new Server(FileSystems.getDefault().getPath("nodeJS", "bin", "www"));
         service  = new SpongeJSService(server);
