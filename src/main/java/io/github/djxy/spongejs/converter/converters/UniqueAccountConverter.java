@@ -1,8 +1,9 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
+import io.github.djxy.spongejs.converter.ConverterInfo;
+import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
@@ -25,7 +26,7 @@ public class UniqueAccountConverter extends ConverterV8Object<UniqueAccount> {
             identifier = (String) o;
         else if(o instanceof V8Object){
             if(((V8Object) o).contains("getUniqueID"))
-                identifier = ((V8Object) o).executeStringFunction("getUniqueID", new V8Array(((V8Object) o).getRuntime()));
+                identifier = ((V8Object) o).executeStringFunction("getUniqueID", null);
         }
 
         if(identifier == null)
@@ -43,6 +44,6 @@ public class UniqueAccountConverter extends ConverterV8Object<UniqueAccount> {
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, UniqueAccount account) {}
+    public void setV8Object(V8Object v8Object, V8 v8, UniqueAccount account, UUID uniqueIdentifier) {}
 
 }

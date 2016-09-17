@@ -1,6 +1,9 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.*;
+import io.github.djxy.spongejs.converter.Converter;
+import io.github.djxy.spongejs.converter.ConverterInfo;
+import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
@@ -14,6 +17,7 @@ import org.spongepowered.api.text.Text;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Created by Samuel on 2016-09-07.
@@ -38,7 +42,7 @@ public class AccountConverter extends ConverterV8Object<Account> {
             identifier = (String) o;
         else if(o instanceof V8Object)
             if(((V8Object) o).contains("getIdentifier"))
-                identifier = ((V8Object) o).executeStringFunction("getIdentifier", new V8Array(((V8Object) o).getRuntime()));
+                identifier = ((V8Object) o).executeStringFunction("getIdentifier", null);
 
         if(identifier == null)
             throw new IllegalArgumentException("Should be a string or an account.");
@@ -52,7 +56,7 @@ public class AccountConverter extends ConverterV8Object<Account> {
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, Account account) {
+    public void setV8Object(V8Object v8Object, V8 v8, Account account, UUID uniqueIdentifier) {
         v8Object.add("deposit", new V8Function(v8, (receiver, parameters) -> {
             TransactionResult transactionResult = null;
 
@@ -145,7 +149,7 @@ public class AccountConverter extends ConverterV8Object<Account> {
                 map = account.resetBalances(Converter.convertFromV8(Cause.class, parameters.get(1)), Converter.convertSetFromV8(Context.class, parameters.get(2)));
 
             if(map == null || map.isEmpty())
-                return new V8Object(v8);
+                return new V8Array(v8);
 
             V8Array v8Array = new V8Array(v8);
 

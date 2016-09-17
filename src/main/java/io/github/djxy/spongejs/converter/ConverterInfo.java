@@ -1,4 +1,4 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,11 +1,9 @@
 package io.github.djxy.spongejs.module.modules;
 
 import com.eclipsesource.v8.*;
-import io.github.djxy.spongejs.converters.Converter;
+import io.github.djxy.spongejs.converter.Converter;
 import io.github.djxy.spongejs.module.Module;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;

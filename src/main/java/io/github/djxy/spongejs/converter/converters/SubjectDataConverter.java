@@ -1,24 +1,24 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.*;
+import io.github.djxy.spongejs.converter.Converter;
+import io.github.djxy.spongejs.converter.ConverterInfo;
+import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by samuelmarchildon-lavoie on 16-09-10.
  */
 @ConverterInfo(type = SubjectData.class)
-public class SubjectDataConverter extends ConverterV8Object<SubjectData>{
+public class SubjectDataConverter extends ConverterV8Object<SubjectData> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, SubjectData subject) {
+    public void setV8Object(V8Object v8Object, V8 v8, SubjectData subject, UUID uniqueIdentifier) {
         v8Object.add("addParent", new V8Function(v8, (receiver, parameters) -> subject.addParent(Converter.convertSetFromV8(Context.class, parameters.get(0)), Converter.convertFromV8(Subject.class, parameters.get(1)))));
         v8Object.add("clearOptions", new V8Function(v8, (receiver, parameters) -> {
             if(parameters.length() == 0)

@@ -1,15 +1,19 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
+import io.github.djxy.spongejs.converter.Converter;
+import io.github.djxy.spongejs.converter.ConverterInfo;
+import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Created by Samuel on 2016-09-07.
@@ -18,20 +22,20 @@ import java.math.BigDecimal;
 public class CurrencyConverter extends ConverterV8Object<Currency> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, Currency currency) {
-        v8Object.add("format", new V8Function(v8, (receiver, parameters) -> {
+    public void setV8Object(V8Object v8Object, V8 v8, Currency currency, UUID uniqueIdentifier) {
+        v8Object.add("format", registerV8Function(new V8Function(v8, (receiver, parameters) -> {
             if(parameters.length() == 1)
                 return Converter.convertToV8(v8, Text.class, currency.format(Converter.convertFromV8(BigDecimal.class, parameters.get(0))));
             else if(parameters.length() == 2)
                 return Converter.convertToV8(v8, Text.class, currency.format(Converter.convertFromV8(BigDecimal.class, parameters.get(0)), parameters.getInteger(1)));
             else
                 return null;
-        }));
-        v8Object.add("getDefaultFractionDigits", new V8Function(v8, (receiver, parameters) -> currency.getDefaultFractionDigits()));
-        v8Object.add("getDisplayName", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getDisplayName())));
-        v8Object.add("getPluralDisplayName", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getPluralDisplayName())));
-        v8Object.add("getSymbol", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getSymbol())));
-        v8Object.add("isDefault", new V8Function(v8, (receiver, parameters) -> currency.isDefault()));
+        }), uniqueIdentifier));
+        v8Object.add("getDefaultFractionDigits", registerV8Function(new V8Function(v8, (receiver, parameters) -> currency.getDefaultFractionDigits()), uniqueIdentifier));
+        v8Object.add("getDisplayName", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getDisplayName())), uniqueIdentifier));
+        v8Object.add("getPluralDisplayName", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getPluralDisplayName())), uniqueIdentifier));
+        v8Object.add("getSymbol", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Text.class, currency.getSymbol())), uniqueIdentifier));
+        v8Object.add("isDefault", registerV8Function(new V8Function(v8, (receiver, parameters) -> currency.isDefault()), uniqueIdentifier));
     }
 
     @Override
@@ -41,7 +45,7 @@ public class CurrencyConverter extends ConverterV8Object<Currency> {
         if(o instanceof String)
             currencyId = (String) o;
         else if(o instanceof V8Object)
-            currencyId = ((V8Object) o).executeStringFunction("getId", new V8Array(((V8Object) o).getRuntime()));
+            currencyId = ((V8Object) o).executeStringFunction("getId", null);
 
         if(currencyId == null)
             throw new IllegalArgumentException("Should be a string or a currency object.");

@@ -2,7 +2,7 @@ package io.github.djxy.spongejs;
 
 import com.eclipsesource.v8.V8;
 import com.google.inject.Inject;
-import io.github.djxy.spongejs.converters.Converter;
+import io.github.djxy.spongejs.converter.Converter;
 import io.github.djxy.spongejs.module.modules.*;
 import io.github.djxy.spongejs.util.LibraryLoader;
 import org.slf4j.Logger;
@@ -10,6 +10,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStoppedEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.lang.reflect.Field;
@@ -29,6 +30,10 @@ public class SpongeJS {
     @Inject
     private Logger logger;
 
+    public static void main(){
+
+    }
+
     @Listener
     public void onGamePostInitializationEvent(GamePostInitializationEvent event){
         serverPath = FileSystems.getDefault().getPath("nodeJS", "bin", "www");
@@ -42,7 +47,7 @@ public class SpongeJS {
 
         init();
 
-        server = new Server(serverPath);
+        server = new Server(logger, serverPath);
         service  = new SpongeJSService(server);
 
         Sponge.getServiceManager().setProvider(this, SpongeJSService.class, service);
@@ -61,6 +66,11 @@ public class SpongeJS {
         server.init();
         server.getRuntime().add("serverCause", "SpongeJS");
         server.start();
+    }
+
+    @Listener
+    public void onGameStoppedEvent(GameStoppedEvent event){
+        server.stop();
     }
 
     private static void init(){

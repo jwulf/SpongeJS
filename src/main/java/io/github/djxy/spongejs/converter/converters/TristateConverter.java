@@ -1,7 +1,8 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.V8;
-import org.spongepowered.api.text.Text;
+import io.github.djxy.spongejs.converter.Converter;
+import io.github.djxy.spongejs.converter.ConverterInfo;
 import org.spongepowered.api.util.Tristate;
 
 /**

@@ -1,12 +1,16 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
+import io.github.djxy.spongejs.converter.Converter;
+import io.github.djxy.spongejs.converter.ConverterInfo;
+import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+
+import java.util.UUID;
 
 /**
  * Created by samuelmarchildon-lavoie on 16-09-09.
@@ -31,7 +35,7 @@ public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
             if(((V8Object) o).getRuntime().getObject("console").equals(o))
                 return Sponge.getServer().getConsole();
             if(((V8Object) o).contains("getIdentifier"))
-                identifier = ((V8Object) o).executeStringFunction("getIdentifier", new V8Array(((V8Object) o).getRuntime()));
+                identifier = ((V8Object) o).executeStringFunction("getIdentifier", null);
         }
 
         if(identifier == null)
@@ -44,7 +48,7 @@ public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource) {
+    public void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource, UUID uniqueIdentifier) {
         v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> commandSource.getName()));
     }
 

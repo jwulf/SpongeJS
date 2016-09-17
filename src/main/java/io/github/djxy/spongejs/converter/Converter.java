@@ -1,17 +1,12 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter;
 
-import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Object;
-import com.eclipsesource.v8.V8Value;
+import com.eclipsesource.v8.*;
 import com.google.common.reflect.ClassPath;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Samuel on 2016-09-07.
@@ -20,6 +15,7 @@ public abstract class Converter<V, T> {
 
     private static HashMap<Class, Converter> converters = new HashMap<>();
     private static HashMap<Class, V8ObjectCreator> objectCreators = new HashMap<>();
+    private static ConcurrentHashMap<UUID, CopyOnWriteArrayList<V8Function>> functions = new ConcurrentHashMap<>();
 
     public static <Y extends Object> Y convertFromV8(Class<Y> type, Object o){
         if(!converters.containsKey(type) || o == null)
@@ -39,7 +35,22 @@ public abstract class Converter<V, T> {
         if(!objectCreators.containsKey(type))
             return null;
 
-        return ((V8ObjectCreatorV8Object)objectCreators.get(type)).editV8Object(object, o);
+        return ((V8ObjectCreatorV8Object)objectCreators.get(type)).editV8Object(object, o, UUID.randomUUID());
+    }
+
+    public synchronized static V8Function registerV8Function(V8Function function, UUID uniqueIdentifier){
+        if(!functions.containsKey(uniqueIdentifier))
+            functions.put(uniqueIdentifier, new CopyOnWriteArrayList<>());
+
+        functions.get(uniqueIdentifier).add(function);
+
+        return function;
+    }
+
+    public static void releaseRegistredFunctions(UUID uniqueIdentifier){
+        if(functions.containsKey(uniqueIdentifier))
+            for(V8Function function : functions.get(uniqueIdentifier))
+                function.release();
     }
 
     public static <Y extends Object> Object convertIterableToV8(V8 v8, Class<Y> type, Iterable<Y> o){
@@ -137,16 +148,17 @@ public abstract class Converter<V, T> {
         @Override
         public <Y> Object createV8Object(V8 v8, Y o) {
             V8Object v8Object = new V8Object(v8);
+            UUID uniqueIdentifer = UUID.randomUUID();
 
             for(ConverterV8Object converterV8Object : converters)
-                converterV8Object.setV8Object(v8Object, v8, o);
+                converterV8Object.setV8Object(v8Object, v8, o, uniqueIdentifer);
 
             return v8Object;
         }
 
-        public <Y extends Object> Object editV8Object(V8Object v8Object, Y o){
+        public <Y extends Object> Object editV8Object(V8Object v8Object, Y o, UUID uniqueIdentifier){
             for(ConverterV8Object converterV8Object : converters)
-                converterV8Object.setV8Object(v8Object, v8Object.getRuntime(), o);
+                converterV8Object.setV8Object(v8Object, v8Object.getRuntime(), o, uniqueIdentifier);
 
             return v8Object;
         }
@@ -158,7 +170,7 @@ public abstract class Converter<V, T> {
             return;
 
         try {
-            for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses("io.github.djxy.spongejs.converters")) {
+            for (ClassPath.ClassInfo info : ClassPath.from(Converter.class.getClassLoader()).getTopLevelClasses("io.github.djxy.spongejs.converter.converters")) {
                 Class clazz = info.load();
 
                 Annotation annotation = clazz.getAnnotation(ConverterInfo.class);
@@ -182,18 +194,29 @@ public abstract class Converter<V, T> {
     private static void initObjectCreators(){
         for(Class c : converters.keySet()) {
             if (objectCreators.get(c) instanceof V8ObjectCreatorV8Object) {
-                initObjectCreator(c, (V8ObjectCreatorV8Object) objectCreators.get(c));
+                initObjectCreatorInterfaces(c, (V8ObjectCreatorV8Object) objectCreators.get(c));
+                initObjectCreatorSuperClass(c, (V8ObjectCreatorV8Object) objectCreators.get(c));
                 ((V8ObjectCreatorV8Object) objectCreators.get(c)).converters.add((ConverterV8Object) converters.get(c));
+                ((V8ObjectCreatorV8Object) objectCreators.get(c)).converters.add((ConverterV8Object) converters.get(Object.class));
             }
         }
     }
 
-    private static void initObjectCreator(Class scan, V8ObjectCreatorV8Object objectCreatorV8Object){
+    private static void initObjectCreatorInterfaces(Class scan, V8ObjectCreatorV8Object objectCreatorV8Object){
         for(Class c : scan.getInterfaces()){
             if(converters.containsKey(c))
                 objectCreatorV8Object.converters.add((ConverterV8Object) converters.get(c));
 
-            initObjectCreator(c, objectCreatorV8Object);
+            initObjectCreatorInterfaces(c, objectCreatorV8Object);
+        }
+    }
+
+    private static void initObjectCreatorSuperClass(Class scan, V8ObjectCreatorV8Object objectCreatorV8Object){
+        if(scan.getSuperclass() != null) {
+            if(converters.containsKey(scan.getSuperclass()))
+                objectCreatorV8Object.converters.add((ConverterV8Object) converters.get(scan.getSuperclass()));
+
+            initObjectCreatorSuperClass(scan.getSuperclass(), objectCreatorV8Object);
         }
     }
 

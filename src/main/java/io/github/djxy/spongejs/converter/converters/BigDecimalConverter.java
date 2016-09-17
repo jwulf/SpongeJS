@@ -1,8 +1,8 @@
-package io.github.djxy.spongejs.converters;
+package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Function;
-import com.eclipsesource.v8.V8Object;
+import io.github.djxy.spongejs.converter.Converter;
+import io.github.djxy.spongejs.converter.ConverterInfo;
 
 import java.math.BigDecimal;
 
