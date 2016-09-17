@@ -207,9 +207,12 @@ abstract public class V8Value implements Releasable {
      */
     public boolean strictEquals(final Object that) {
         v8.checkThread();
-        checkReleased();
+
         if (that == this) {
             return true;
+        }
+        if(isReleased()) {
+            return false;
         }
         if (that == null) {
             return false;
