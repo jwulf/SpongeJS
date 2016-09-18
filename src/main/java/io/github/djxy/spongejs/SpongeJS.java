@@ -3,18 +3,24 @@ package io.github.djxy.spongejs;
 import com.eclipsesource.v8.V8;
 import com.google.inject.Inject;
 import io.github.djxy.spongejs.converter.Converter;
-import io.github.djxy.spongejs.module.modules.*;
+import io.github.djxy.spongejs.module.modules.CommandModule;
+import io.github.djxy.spongejs.module.modules.ConsoleModule;
+import io.github.djxy.spongejs.module.modules.EconomyModule;
+import io.github.djxy.spongejs.module.modules.PermissionModule;
+import io.github.djxy.spongejs.module.modules.ServerModule;
 import io.github.djxy.spongejs.util.LibraryLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppedEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.lang.reflect.Field;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 /**
@@ -25,21 +31,20 @@ public class SpongeJS {
 
     private Server server;
     private SpongeJSService service;
-    private Path serverPath;
 
     @Inject
     private Logger logger;
-
-    public static void main(){
-
-    }
+    @Inject
+    @DefaultConfig(sharedRoot = false)
+    private Path configPath;
+    private Config config;
 
     @Listener
-    public void onGamePostInitializationEvent(GamePostInitializationEvent event){
-        serverPath = FileSystems.getDefault().getPath("nodeJS", "bin", "www");
+    public void onGamePreInitializationEvent(GamePreInitializationEvent event){
+        config = new Config(configPath);
 
-        if(!serverPath.toFile().exists()) {
-            logger.error("NodeJS server not found. Make sure to have " + serverPath.toAbsolutePath());
+        if(!config.getStartingFile().exists()) {
+            logger.error("NodeJS server not found. Make sure to have " + config.getStartingFile().getAbsolutePath());
             return;
         }
 
@@ -47,7 +52,7 @@ public class SpongeJS {
 
         init();
 
-        server = new Server(logger, serverPath);
+        server = new Server(logger, config);
         service  = new SpongeJSService(server);
 
         Sponge.getServiceManager().setProvider(this, SpongeJSService.class, service);
@@ -55,7 +60,7 @@ public class SpongeJS {
 
     @Listener
     public void onGameAboutToStartServerEvent(GameAboutToStartServerEvent event){
-        if(!serverPath.toFile().exists())
+        if(!config.getStartingFile().exists())
             return;
 
         server.addModule(new PermissionModule());
@@ -63,14 +68,27 @@ public class SpongeJS {
         server.addModule(new CommandModule());
         server.addModule(new ConsoleModule());
         server.addModule(new ServerModule());
-        server.init();
-        server.getRuntime().add("serverCause", "SpongeJS");
         server.start();
+
+        Sponge.getCommandManager().register(this,
+                CommandSpec
+                        .builder()
+                        .child(CommandSpec.builder().executor((commandSource, commandContext) -> {
+                            server.start();
+                            return CommandResult.success();
+                        }).build(), "start")
+                        .child(CommandSpec.builder().executor((commandSource, commandContext) -> {
+                            server.stop();
+                            return CommandResult.success();
+                        }).build(), "stop")
+                        .build()
+                , "spongejs");
     }
 
     @Listener
     public void onGameStoppedEvent(GameStoppedEvent event){
-        server.stop();
+        if(server != null)
+            server.stop();
     }
 
     private static void init(){

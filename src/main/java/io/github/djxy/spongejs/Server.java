@@ -1,18 +1,15 @@
 package io.github.djxy.spongejs;
 
-import com.eclipsesource.v8.*;
+import com.eclipsesource.v8.NodeJS;
+import com.eclipsesource.v8.ReferenceHandler;
+import com.eclipsesource.v8.V8Value;
+import io.github.djxy.spongejs.converter.Converter;
 import io.github.djxy.spongejs.module.Module;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by samuelmarchildon-lavoie on 16-09-06.
@@ -21,63 +18,79 @@ public final class Server {
 
     private Logger logger;
     private NodeJS nodeJS;
-    private Path startingFile;
     private Thread thread;
-    private final ArrayList<Module> modules;
+    private Config config;
     private boolean stop = false;
+    private final ArrayList<Module> modules = new ArrayList<>();
     private final ArrayList<V8Value> modulesValues = new ArrayList<>();
-    private final ServerReferenceHandler handler = new ServerReferenceHandler();
+    private final ServerModuleReferenceHandler moduleHandler = new ServerModuleReferenceHandler();
+    private final ServerReleaseReferenceHandler releaseHandler = new ServerReleaseReferenceHandler();
 
-    protected Server(Logger logger, Path startingFile) {
-        this.startingFile = startingFile;
-        this.modules = new ArrayList<>();
-    }
-
-    public V8 getRuntime(){
-        return nodeJS.getRuntime();
+    protected Server(Logger logger, Config config) {
+        this.logger = logger;
+        this.config = config;
     }
 
     public void addModule(Module module){
         modules.add(module);
     }
 
-    public synchronized void init(){
-        if(nodeJS != null)
-            return;
+    public synchronized boolean start(){
+        if(thread != null) {
+            logger.warn("NodeJS server already running.");
+            return false;
+        }
 
+        logger.info("NodeJS server initialization started...");
+
+        stop = false;
         nodeJS = NodeJS.createNodeJS();
-        nodeJS.getRuntime().addReferenceHandler(handler);
+        nodeJS.getRuntime().removeReferenceHandler(releaseHandler);
+        nodeJS.getRuntime().addReferenceHandler(moduleHandler);
+
+        logger.info("NodeJS server loading modules...");
 
         for(Module module : modules)
-            module.initialize(getRuntime());
+            module.initialize(nodeJS.getRuntime());
 
-        nodeJS.getRuntime().removeReferenceHandler(handler);
-    }
+        logger.info("NodeJS server modules loaded.");
 
-    public synchronized void start(){
-        if(thread != null)
-            return;
+        nodeJS.getRuntime().removeReferenceHandler(moduleHandler);
+        nodeJS.getRuntime().addReferenceHandler(releaseHandler);
 
         nodeJS.getRuntime().getLocker().release();
 
         thread = new Thread(() -> {
             nodeJS.getRuntime().getLocker().acquire();
-            nodeJS.exec(startingFile.toFile());
+            logger.info("NodeJS server started.");
+            nodeJS.exec(config.getStartingFile());
 
             while(!stop && nodeJS.isRunning())
                 nodeJS.handleMessage();
 
             clean();
 
-            System.out.println(nodeJS.getRuntime().getObjectReferenceCount());
+            nodeJS.getRuntime().shutdownExecutors(true);
+            nodeJS.getRuntime().terminateExecution();
+
+            nodeJS.getRuntime().executeVoidScript(config.getShutdownPortScript());
 
             nodeJS.release();
+            logger.info("NodeJS server stopped.");
+            thread = null;
         });
 
         thread.start();
+
+        return true;
     }
 
-    public void clean(){
+    public void stop(){
+        stop = true;
+        new Thread(this::pingServer).start();
+    }
+
+    private void clean(){
         for(V8Value value : modulesValues)
             if(!value.isReleased())
                 value.release();
@@ -85,22 +98,17 @@ public final class Server {
         modulesValues.clear();
     }
 
-    public void stop(){
-        stop = true;
-        pingServer();
-    }
-
     private void pingServer(){
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL("http://localhost:3000/").openConnection();
-            connection.setConnectTimeout(500);
-            connection.setReadTimeout(500);
+            HttpURLConnection connection = (HttpURLConnection) new URL("http://localhost:"+config.getPort()+"/").openConnection();
+            connection.setConnectTimeout(100);
+            connection.setReadTimeout(100);
             connection.getResponseCode();
             connection.disconnect();
         } catch (Exception e) {}
     }
 
-    private class ServerReferenceHandler implements ReferenceHandler {
+    private class ServerModuleReferenceHandler implements ReferenceHandler {
 
         @Override
         public void v8HandleCreated(V8Value object) {
@@ -109,6 +117,18 @@ public final class Server {
 
         @Override
         public void v8HandleDisposed(V8Value object) {}
+
+    }
+
+    private class ServerReleaseReferenceHandler implements ReferenceHandler {
+
+        @Override
+        public void v8HandleCreated(V8Value object) {}
+
+        @Override
+        public void v8HandleDisposed(V8Value object) {
+            Converter.releaseRegistredFunctions(object.getHandle());
+        }
 
     }
 
