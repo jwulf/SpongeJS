@@ -9,7 +9,7 @@ SpongeJS is a Sponge plugin with V8 and NodeJS libraries integrated. You can run
 2. Start your Sponge server and you are ready to create your NodeJS server. You can also use [SpongeJS-Web](https://github.com/djxy/SpongeJS-Web).
 
 ## SpongeJS-Web
-[SpongeJS-Web](https://github.com/djxy/SpongeJS-Web) is a web server for SpongeJS. Currently in development.. 
+[SpongeJS-Web](https://github.com/djxy/SpongeJS-Web) is a web server for SpongeJS. Currently in development.
 
 ## Commands
 - `/spongejs start` - Start your NodeJS server
