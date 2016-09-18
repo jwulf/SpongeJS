@@ -1,7 +1,6 @@
 package io.github.djxy.spongejs.converter.converters;
 
 import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import io.github.djxy.spongejs.converter.Converter;
@@ -13,7 +12,6 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 /**
  * Created by Samuel on 2016-09-07.
@@ -22,7 +20,7 @@ import java.util.UUID;
 public class CurrencyConverter extends ConverterV8Object<Currency> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, Currency currency, UUID uniqueIdentifier) {
+    public void setV8Object(V8Object v8Object, V8 v8, Currency currency, Long uniqueIdentifier) {
         v8Object.add("format", registerV8Function(new V8Function(v8, (receiver, parameters) -> {
             if(parameters.length() == 1)
                 return Converter.convertToV8(v8, Text.class, currency.format(Converter.convertFromV8(BigDecimal.class, parameters.get(0))));

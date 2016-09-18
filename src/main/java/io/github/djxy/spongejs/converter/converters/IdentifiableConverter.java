@@ -17,8 +17,8 @@ import java.util.UUID;
 public class IdentifiableConverter extends ConverterV8Object<Identifiable> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, Identifiable identifiable, UUID uniqueIdentifier) {
-        v8Object.add("getUniqueID", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, UUID.class, identifiable.getUniqueId())));
+    public void setV8Object(V8Object v8Object, V8 v8, Identifiable identifiable, Long uniqueIdentifier) {
+        v8Object.add("getUniqueID", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, UUID.class, identifiable.getUniqueId())), uniqueIdentifier));
     }
 
 }

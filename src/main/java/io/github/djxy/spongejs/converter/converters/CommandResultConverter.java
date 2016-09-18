@@ -6,8 +6,6 @@ import io.github.djxy.spongejs.converter.ConverterInfo;
 import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.command.CommandResult;
 
-import java.util.UUID;
-
 /**
  * Created by samuelmarchildon-lavoie on 16-09-09.
  */
@@ -15,6 +13,6 @@ import java.util.UUID;
 public class CommandResultConverter extends ConverterV8Object<CommandResult> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, CommandResult commandResult, UUID uniqueIdentifier) {}
+    public void setV8Object(V8Object v8Object, V8 v8, CommandResult commandResult, Long uniqueIdentifier) {}
 
 }

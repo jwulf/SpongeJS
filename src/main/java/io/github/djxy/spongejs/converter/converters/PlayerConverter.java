@@ -46,12 +46,12 @@ public class PlayerConverter extends ConverterV8Object<Player> {
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, Player player, UUID uniqueIdentifier) {
-        v8Object.add("hasPlayedBefore", new V8Function(v8, (receiver, parameters) -> player.hasPlayedBefore()));
-        v8Object.add("kick", new V8Function(v8, (receiver, parameters) -> {
+    public void setV8Object(V8Object v8Object, V8 v8, Player player, Long uniqueIdentifier) {
+        v8Object.add("hasPlayedBefore", registerV8Function(new V8Function(v8, (receiver, parameters) -> player.hasPlayedBefore()), uniqueIdentifier));
+        v8Object.add("kick", registerV8Function(new V8Function(v8, (receiver, parameters) -> {
             player.kick();
             return null;
-        }));
+        }), uniqueIdentifier));
     }
 
 }

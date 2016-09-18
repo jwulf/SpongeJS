@@ -15,7 +15,6 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by samuelmarchildon-lavoie on 16-09-10.
@@ -41,10 +40,10 @@ public class SubjectCollectionConverter extends ConverterV8Object<SubjectCollect
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, SubjectCollection collection, UUID uniqueIdentifier) {
-        v8Object.add("get", new V8Function(v8, (receiver, parameters) -> collection.get(parameters.getString(0))));
-        v8Object.add("getAllSubjects", new V8Function(v8, (receiver, parameters) -> Converter.convertIterableToV8(v8, Subject.class, collection.getAllSubjects())));
-        v8Object.add("getAllSubjects", new V8Function(v8, (receiver, parameters) -> {
+    public void setV8Object(V8Object v8Object, V8 v8, SubjectCollection collection, Long uniqueIdentifier) {
+        v8Object.add("get", registerV8Function(new V8Function(v8, (receiver, parameters) -> collection.get(parameters.getString(0))), uniqueIdentifier));
+        v8Object.add("getAllSubjects", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertIterableToV8(v8, Subject.class, collection.getAllSubjects())), uniqueIdentifier));
+        v8Object.add("getAllSubjects", registerV8Function(new V8Function(v8, (receiver, parameters) -> {
             Map<Subject,Boolean> map = null;
 
             if(parameters.length() == 1)
@@ -67,10 +66,10 @@ public class SubjectCollectionConverter extends ConverterV8Object<SubjectCollect
             }
 
             return v8Array;
-        }));
-        v8Object.add("getDefaults", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Subject.class, collection.getDefaults())));
-        v8Object.add("getIdentifier", new V8Function(v8, (receiver, parameters) -> collection.getIdentifier()));
-        v8Object.add("hasRegistered", new V8Function(v8, (receiver, parameters) -> collection.hasRegistered(parameters.getString(0))));
+        }), uniqueIdentifier));
+        v8Object.add("getDefaults", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Subject.class, collection.getDefaults())), uniqueIdentifier));
+        v8Object.add("getIdentifier", registerV8Function(new V8Function(v8, (receiver, parameters) -> collection.getIdentifier()), uniqueIdentifier));
+        v8Object.add("hasRegistered", registerV8Function(new V8Function(v8, (receiver, parameters) -> collection.hasRegistered(parameters.getString(0))), uniqueIdentifier));
     }
 
 }

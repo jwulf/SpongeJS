@@ -10,8 +10,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.UUID;
-
 /**
  * Created by samuelmarchildon-lavoie on 16-09-09.
  */
@@ -48,8 +46,8 @@ public class CommandSourceConverter extends ConverterV8Object<CommandSource> {
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource, UUID uniqueIdentifier) {
-        v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> commandSource.getName()));
+    public void setV8Object(V8Object v8Object, V8 v8, CommandSource commandSource, Long uniqueIdentifier) {
+        v8Object.add("getName", registerV8Function(new V8Function(v8, (receiver, parameters) -> commandSource.getName()), uniqueIdentifier));
     }
 
 }

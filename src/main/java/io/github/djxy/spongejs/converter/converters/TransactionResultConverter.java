@@ -15,7 +15,6 @@ import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 /**
  * Created by Samuel on 2016-09-07.
@@ -24,23 +23,23 @@ import java.util.UUID;
 public class TransactionResultConverter extends ConverterV8Object<TransactionResult> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, TransactionResult transactionResult, UUID uniqueIdentifier) {
-        v8Object.add("getAccount", new V8Function(v8, (receiver, parameters) -> {
+    public void setV8Object(V8Object v8Object, V8 v8, TransactionResult transactionResult, Long uniqueIdentifier) {
+        v8Object.add("getAccount", registerV8Function(new V8Function(v8, (receiver, parameters) -> {
             if(transactionResult.getAccount() instanceof UniqueAccount)
                 return Converter.convertToV8(v8, UniqueAccount.class, (UniqueAccount) transactionResult.getAccount());
 
             return Converter.convertToV8(v8, Account.class, transactionResult.getAccount());
-        }));
+        }), uniqueIdentifier));
 
-        v8Object.add("getAmount", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, BigDecimal.class, transactionResult.getAmount())));
+        v8Object.add("getAmount", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, BigDecimal.class, transactionResult.getAmount())), uniqueIdentifier));
 
-        v8Object.add("getContexts", new V8Function(v8, (receiver, parameters) -> Converter.convertIterableToV8(v8, Context.class, transactionResult.getContexts())));
+        v8Object.add("getContexts", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertIterableToV8(v8, Context.class, transactionResult.getContexts())), uniqueIdentifier));
 
-        v8Object.add("getCurrency", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Currency.class, transactionResult.getCurrency())));
+        v8Object.add("getCurrency", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Currency.class, transactionResult.getCurrency())), uniqueIdentifier));
 
-        v8Object.add("getResult", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, ResultType.class, transactionResult.getResult())));
+        v8Object.add("getResult", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, ResultType.class, transactionResult.getResult())), uniqueIdentifier));
 
-        v8Object.add("getType", new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, TransactionType.class, transactionResult.getType())));
+        v8Object.add("getType", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, TransactionType.class, transactionResult.getType())), uniqueIdentifier));
     }
 
 }

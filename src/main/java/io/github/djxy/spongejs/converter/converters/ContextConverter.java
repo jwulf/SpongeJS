@@ -7,8 +7,6 @@ import io.github.djxy.spongejs.converter.ConverterInfo;
 import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.service.context.Context;
 
-import java.util.UUID;
-
 /**
  * Created by Samuel on 2016-09-07.
  */
@@ -16,18 +14,18 @@ import java.util.UUID;
 public class ContextConverter extends ConverterV8Object<Context> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, Context context, UUID uniqueIdentifier) {
-        v8Object.add("getKey", new V8Function(v8, (receiver, parameters) -> context.getKey()));
-        v8Object.add("getValue", new V8Function(v8, (receiver, parameters) -> context.getValue()));
-        v8Object.add("getName", new V8Function(v8, (receiver, parameters) -> context.getName()));
-        v8Object.add("getType", new V8Function(v8, (receiver, parameters) -> context.getType()));
-        v8Object.add("setValue", new V8Function(v8, (receiver, parameters) -> {
+    public void setV8Object(V8Object v8Object, V8 v8, Context context, Long uniqueIdentifier) {
+        v8Object.add("getKey", registerV8Function(new V8Function(v8, (receiver, parameters) -> context.getKey()), uniqueIdentifier));
+        v8Object.add("getValue", registerV8Function(new V8Function(v8, (receiver, parameters) -> context.getValue()), uniqueIdentifier));
+        v8Object.add("getName", registerV8Function(new V8Function(v8, (receiver, parameters) -> context.getName()), uniqueIdentifier));
+        v8Object.add("getType", registerV8Function(new V8Function(v8, (receiver, parameters) -> context.getType()), uniqueIdentifier));
+        v8Object.add("setValue", registerV8Function(new V8Function(v8, (receiver, parameters) -> {
             String lastValue = context.getValue();
 
             context.setValue(parameters.getString(0));
 
             return lastValue;
-        }));
+        }), uniqueIdentifier));
     }
 
     @Override

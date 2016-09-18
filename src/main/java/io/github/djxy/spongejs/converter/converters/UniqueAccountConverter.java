@@ -44,6 +44,6 @@ public class UniqueAccountConverter extends ConverterV8Object<UniqueAccount> {
     }
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, UniqueAccount account, UUID uniqueIdentifier) {}
+    public void setV8Object(V8Object v8Object, V8 v8, UniqueAccount account, Long uniqueIdentifier) {}
 
 }

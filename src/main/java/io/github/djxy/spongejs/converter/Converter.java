@@ -15,7 +15,7 @@ public abstract class Converter<V, T> {
 
     private static HashMap<Class, Converter> converters = new HashMap<>();
     private static HashMap<Class, V8ObjectCreator> objectCreators = new HashMap<>();
-    private static ConcurrentHashMap<UUID, CopyOnWriteArrayList<V8Function>> functions = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Long, CopyOnWriteArrayList<V8Function>> functions = new ConcurrentHashMap<>();
 
     public static <Y extends Object> Y convertFromV8(Class<Y> type, Object o){
         if(!converters.containsKey(type) || o == null)
@@ -35,10 +35,10 @@ public abstract class Converter<V, T> {
         if(!objectCreators.containsKey(type))
             return null;
 
-        return ((V8ObjectCreatorV8Object)objectCreators.get(type)).editV8Object(object, o, UUID.randomUUID());
+        return ((V8ObjectCreatorV8Object)objectCreators.get(type)).editV8Object(object, o);
     }
 
-    public synchronized static V8Function registerV8Function(V8Function function, UUID uniqueIdentifier){
+    public synchronized static V8Function registerV8Function(V8Function function, Long uniqueIdentifier){
         if(!functions.containsKey(uniqueIdentifier))
             functions.put(uniqueIdentifier, new CopyOnWriteArrayList<>());
 
@@ -47,10 +47,14 @@ public abstract class Converter<V, T> {
         return function;
     }
 
-    public static void releaseRegistredFunctions(UUID uniqueIdentifier){
-        if(functions.containsKey(uniqueIdentifier))
-            for(V8Function function : functions.get(uniqueIdentifier))
+    public static void releaseRegistredFunctions(Long uniqueIdentifier){
+        if(functions.containsKey(uniqueIdentifier)) {
+            for (V8Function function : functions.get(uniqueIdentifier))
                 function.release();
+
+            functions.get(uniqueIdentifier).clear();
+            functions.remove(uniqueIdentifier);
+        }
     }
 
     public static <Y extends Object> Object convertIterableToV8(V8 v8, Class<Y> type, Iterable<Y> o){
@@ -148,17 +152,16 @@ public abstract class Converter<V, T> {
         @Override
         public <Y> Object createV8Object(V8 v8, Y o) {
             V8Object v8Object = new V8Object(v8);
-            UUID uniqueIdentifer = UUID.randomUUID();
 
             for(ConverterV8Object converterV8Object : converters)
-                converterV8Object.setV8Object(v8Object, v8, o, uniqueIdentifer);
+                converterV8Object.setV8Object(v8Object, v8, o, v8Object.getHandle());
 
             return v8Object;
         }
 
-        public <Y extends Object> Object editV8Object(V8Object v8Object, Y o, UUID uniqueIdentifier){
+        public <Y extends Object> Object editV8Object(V8Object v8Object, Y o){
             for(ConverterV8Object converterV8Object : converters)
-                converterV8Object.setV8Object(v8Object, v8Object.getRuntime(), o, uniqueIdentifier);
+                converterV8Object.setV8Object(v8Object, v8Object.getRuntime(), o, v8Object.getHandle());
 
             return v8Object;
         }

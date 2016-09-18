@@ -10,6 +10,9 @@
  ******************************************************************************/
 package com.eclipsesource.v8;
 
+import com.eclipsesource.v8.utils.V8Executor;
+import com.eclipsesource.v8.utils.V8Map;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -19,9 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.eclipsesource.v8.utils.V8Executor;
-import com.eclipsesource.v8.utils.V8Map;
 
 /**
  * An isolated V8Runtime. All JavaScript execution must exist

@@ -7,8 +7,6 @@ import io.github.djxy.spongejs.converter.ConverterInfo;
 import io.github.djxy.spongejs.converter.ConverterV8Object;
 import org.spongepowered.api.CatalogType;
 
-import java.util.UUID;
-
 /**
  * Created by Samuel on 2016-09-07.
  */
@@ -16,7 +14,7 @@ import java.util.UUID;
 public class CatalogTypeConverter extends ConverterV8Object<CatalogType> {
 
     @Override
-    public void setV8Object(V8Object v8Object, V8 v8, CatalogType v, UUID uniqueIdentifier) {
+    public void setV8Object(V8Object v8Object, V8 v8, CatalogType v, Long uniqueIdentifier) {
         v8Object.add("getId", registerV8Function(new V8Function(v8, (receiver, parameters) -> v.getId()), uniqueIdentifier));
         v8Object.add("getName", registerV8Function(new V8Function(v8, (receiver, parameters) -> v.getName()), uniqueIdentifier));
     }
