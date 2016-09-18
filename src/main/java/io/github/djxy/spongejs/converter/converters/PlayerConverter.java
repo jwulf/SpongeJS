@@ -40,7 +40,12 @@ public class PlayerConverter extends ConverterV8Object<Player> {
 
             if(player.isPresent())
                 return player.get();
-        }catch (Exception e){}
+        }catch (Exception e){
+            Optional<Player> player = Sponge.getServer().getPlayer(identifier);
+
+            if(player.isPresent())
+                return player.get();
+        }
 
         return super.convertFromV8(o);
     }
