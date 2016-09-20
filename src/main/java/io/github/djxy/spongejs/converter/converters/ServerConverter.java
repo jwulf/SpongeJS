@@ -31,6 +31,7 @@ public class ServerConverter extends ConverterV8Object<Server> {
             return v8Array;
         }), uniqueIdentifier));
         v8Object.add("getPlayer", registerV8Function(new V8Function(v8, (receiver, parameters) -> Converter.convertToV8(v8, Player.class, Converter.convertFromV8(Player.class, parameters.get(0)))), uniqueIdentifier));
+        v8Object.add("getConsole", registerV8Function(new V8Function(v8, (receiver, parameters) -> v8.get("console")), uniqueIdentifier));
     }
 
 }
