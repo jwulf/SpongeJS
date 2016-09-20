@@ -6,6 +6,7 @@ import io.github.djxy.spongejs.converter.Converter;
 import io.github.djxy.spongejs.module.modules.ConsoleModule;
 import io.github.djxy.spongejs.module.modules.EconomyModule;
 import io.github.djxy.spongejs.module.modules.PermissionModule;
+import io.github.djxy.spongejs.module.modules.SpongeModule;
 import io.github.djxy.spongejs.util.LibraryLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -61,6 +62,7 @@ public class SpongeJS {
         if(!config.getStartingFile().exists())
             return;
 
+        server.addModule(new SpongeModule());
         server.addModule(new PermissionModule());
         server.addModule(new EconomyModule());
         server.addModule(new ConsoleModule());
