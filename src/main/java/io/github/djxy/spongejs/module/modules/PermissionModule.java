@@ -35,7 +35,7 @@ public class PermissionModule implements Module {
             Map<String,SubjectCollection> map = permissionService.getKnownSubjects();
 
             for(String key : map.keySet())
-                collections.add(key, (V8Value) Converter.convertToV8(serverRuntime, SubjectCollection.class, map.get(key)));
+                collections.add(key, Converter.registerV8Value((V8Value) Converter.convertToV8(serverRuntime, SubjectCollection.class, map.get(key)), collections.getHandle()));
 
             return collections;
         }));

@@ -57,9 +57,9 @@ public class SubjectCollectionConverter extends ConverterV8Object<SubjectCollect
             V8Array v8Array = new V8Array(v8);
 
             for(Subject subject : map.keySet()){
-                V8Object object = new V8Object(v8);
+                V8Object object = registerV8Object(new V8Object(v8), v8Array.getHandle());
 
-                object.add("subject", (V8Value) Converter.convertToV8(v8, Subject.class, subject));
+                object.add("subject", registerV8Object((V8Object) Converter.convertToV8(v8, Subject.class, subject), object.getHandle()));
                 object.add("value", map.get(subject));
 
                 v8Array.push(object);

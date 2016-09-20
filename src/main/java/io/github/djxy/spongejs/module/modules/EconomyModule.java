@@ -32,7 +32,7 @@ public class EconomyModule implements Module {
             V8Array v8Array = new V8Array(serverRuntime);
 
             for (Currency currency : economyService.getCurrencies())
-                v8Array.push((V8Value) Converter.convertToV8(serverRuntime, Currency.class, currency));
+                v8Array.push(Converter.registerV8Value((V8Value) Converter.convertToV8(serverRuntime, Currency.class, currency), v8Array.getHandle()));
 
             return v8Array;
         }));

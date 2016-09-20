@@ -99,9 +99,9 @@ public class AccountConverter extends ConverterV8Object<Account> {
             V8Array v8Array = new V8Array(v8);
 
             for(Currency currency : map.keySet()){
-                V8Object object = new V8Object(v8);
+                V8Object object = registerV8Object(new V8Object(v8), v8Array.getHandle());
 
-                object.add("currency", (V8Value) Converter.convertToV8(v8, Currency.class, currency));
+                object.add("currency", registerV8Object((V8Object) Converter.convertToV8(v8, Currency.class, currency), object.getHandle()));
                 object.add("balance", (double) Converter.convertToV8(v8, BigDecimal.class, map.get(currency)));
 
                 v8Array.push(object);
@@ -153,10 +153,10 @@ public class AccountConverter extends ConverterV8Object<Account> {
             V8Array v8Array = new V8Array(v8);
 
             for(Currency currency : map.keySet()){
-                V8Object object = new V8Object(v8);
+                V8Object object = registerV8Object(new V8Object(v8), v8Array.getHandle());
 
-                object.add("currency", (V8Value) Converter.convertToV8(v8, Currency.class, currency));
-                object.add("transactionResult", (V8Value) Converter.convertToV8(v8, TransactionResult.class, map.get(currency)));
+                object.add("currency", registerV8Object((V8Object) Converter.convertToV8(v8, Currency.class, currency), v8Array.getHandle()));
+                object.add("transactionResult", registerV8Object((V8Object) Converter.convertToV8(v8, TransactionResult.class, map.get(currency)), v8Array.getHandle()));
 
                 v8Array.push(object);
             }

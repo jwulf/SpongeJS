@@ -26,7 +26,7 @@ public class ServerConverter extends ConverterV8Object<Server> {
             V8Array v8Array = new V8Array(v8);
 
             for(Player player : server.getOnlinePlayers())
-                v8Array.push((V8Value) Converter.convertToV8(v8, Player.class, player));
+                v8Array.push(registerV8Object((V8Object) Converter.convertToV8(v8, Player.class, player), v8Array.getHandle()));
 
             return v8Array;
         }), uniqueIdentifier));

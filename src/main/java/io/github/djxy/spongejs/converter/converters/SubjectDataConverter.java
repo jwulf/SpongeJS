@@ -50,13 +50,13 @@ public class SubjectDataConverter extends ConverterV8Object<SubjectData> {
             V8Array v8Array = new V8Array(v8);
 
             for(Set<Context> contexts : options.keySet()){
-                V8Object object = new V8Object(v8);
+                V8Object object = registerV8Object(new V8Object(v8), v8Array.getHandle());
 
-                object.add("contexts", (V8Value) Converter.convertIterableToV8(v8, Context.class, contexts));
+                object.add("contexts", registerV8Object((V8Object) Converter.convertIterableToV8(v8, Context.class, contexts), object.getHandle()));
 
-                V8Object objectOptions = new V8Object(v8);
+                V8Object objectOptions = registerV8Object(new V8Object(v8), object.getHandle());
 
-                Map<String,String> mapOption = options.get(contexts);
+                Map<String, String> mapOption = options.get(contexts);
 
                 for(String option : mapOption.keySet())
                     objectOptions.add(option, mapOption.get(option));
@@ -87,10 +87,10 @@ public class SubjectDataConverter extends ConverterV8Object<SubjectData> {
             V8Array v8Array = new V8Array(v8);
 
             for(Set<Context> contexts : subjects.keySet()){
-                V8Object object = new V8Object(v8);
+                V8Object object = registerV8Object(new V8Object(v8), v8Array.getHandle());
 
-                object.add("contexts", (V8Value) Converter.convertIterableToV8(v8, Context.class, contexts));
-                object.add("subjects", (V8Value) Converter.convertIterableToV8(v8, Subject.class, subjects.get(contexts)));
+                object.add("contexts", registerV8Value((V8Value) Converter.convertIterableToV8(v8, Context.class, contexts), object.getHandle()));
+                object.add("subjects", registerV8Value((V8Value) Converter.convertIterableToV8(v8, Subject.class, subjects.get(contexts)), object.getHandle()));
 
                 v8Array.push(object);
             }
@@ -109,11 +109,11 @@ public class SubjectDataConverter extends ConverterV8Object<SubjectData> {
             V8Array v8Array = new V8Array(v8);
 
             for(Set<Context> contexts : permissions.keySet()){
-                V8Object object = new V8Object(v8);
+                V8Object object = registerV8Object(new V8Object(v8), v8Array.getHandle());
 
-                object.add("contexts", (V8Value) Converter.convertIterableToV8(v8, Context.class, contexts));
+                object.add("contexts", registerV8Value((V8Value) Converter.convertIterableToV8(v8, Context.class, contexts), object.getHandle()));
 
-                V8Object objectPermissions = new V8Object(v8);
+                V8Object objectPermissions = registerV8Object(new V8Object(v8), object.getHandle());
 
                 Map<String,Boolean> mapPermission = permissions.get(contexts);
 

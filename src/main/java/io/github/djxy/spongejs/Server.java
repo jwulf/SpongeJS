@@ -129,7 +129,7 @@ public final class Server {
 
         @Override
         public void v8HandleDisposed(V8Value object) {
-            Converter.releaseRegistredFunctions(object.getHandle());
+            Converter.releaseRegistredValues(object.getHandle());
         }
 
     }

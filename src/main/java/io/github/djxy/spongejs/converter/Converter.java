@@ -15,7 +15,7 @@ public abstract class Converter<V, T> {
 
     private static HashMap<Class, Converter> converters = new HashMap<>();
     private static HashMap<Class, V8ObjectCreator> objectCreators = new HashMap<>();
-    private static ConcurrentHashMap<Long, CopyOnWriteArrayList<V8Function>> functions = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Long, CopyOnWriteArrayList<V8Value>> v8Values = new ConcurrentHashMap<>();
 
     public static <Y extends Object> Y convertFromV8(Class<Y> type, Object o){
         if(!converters.containsKey(type) || o == null)
@@ -38,22 +38,36 @@ public abstract class Converter<V, T> {
         return ((V8ObjectCreatorV8Object)objectCreators.get(type)).editV8Object(object, o);
     }
 
-    public synchronized static V8Function registerV8Function(V8Function function, Long uniqueIdentifier){
-        if(!functions.containsKey(uniqueIdentifier))
-            functions.put(uniqueIdentifier, new CopyOnWriteArrayList<>());
-
-        functions.get(uniqueIdentifier).add(function);
-
-        return function;
+    public static V8Function registerV8Function(V8Function value, Long uniqueIdentifier){
+        registerV8Value(value, uniqueIdentifier);
+        return value;
     }
 
-    public static void releaseRegistredFunctions(Long uniqueIdentifier){
-        if(functions.containsKey(uniqueIdentifier)) {
-            for (V8Function function : functions.get(uniqueIdentifier))
-                function.release();
+    public static V8Array registerV8Array(V8Array value, Long uniqueIdentifier){
+        registerV8Value(value, uniqueIdentifier);
+        return value;
+    }
 
-            functions.get(uniqueIdentifier).clear();
-            functions.remove(uniqueIdentifier);
+    public static V8Object registerV8Object(V8Object value, Long uniqueIdentifier){
+        registerV8Value(value, uniqueIdentifier);
+        return value;
+    }
+
+    public synchronized static V8Value registerV8Value(V8Value value, Long uniqueIdentifier){
+        if(!v8Values.containsKey(uniqueIdentifier))
+            v8Values.put(uniqueIdentifier, new CopyOnWriteArrayList<>());
+
+        v8Values.get(uniqueIdentifier).add(value);
+        return value;
+    }
+
+    public static void releaseRegistredValues(Long uniqueIdentifier){
+        if(v8Values.containsKey(uniqueIdentifier)) {
+            for (V8Value value : v8Values.get(uniqueIdentifier))
+                value.release();
+
+            v8Values.get(uniqueIdentifier).clear();
+            v8Values.remove(uniqueIdentifier);
         }
     }
 
@@ -67,7 +81,7 @@ public abstract class Converter<V, T> {
             Object object = objectCreators.get(type).createV8Object(v8, y);
 
             if(object instanceof V8Value)
-                array.push((V8Value) object);
+                array.push(registerV8Value((V8Value) object, array.getHandle()));
             else if(object instanceof String)
                 array.push((String) object);
             else if(object instanceof Integer)
