@@ -75,6 +75,8 @@ public final class Server {
 
             nodeJS.getRuntime().executeVoidScript(config.getShutdownPortScript());
 
+            logger.info("Object not released: "+nodeJS.getRuntime().getObjectReferenceCount());
+
             nodeJS.release();
             logger.info("NodeJS server stopped.");
             thread = null;
