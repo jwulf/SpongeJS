@@ -16,7 +16,7 @@ SpongeJS is a Sponge plugin with V8 and NodeJS libraries integrated. You can run
 - `/spongejs stop` - Stop your NodeJS server
 
 ## How to interact with Sponge
-Currently, SpongeJS offers 5 globals variables to interact with Sponge.
+Currently, SpongeJS offers some globals variables to interact with Sponge.
 - `console`
 - `economyService`
 - `permissionService`
